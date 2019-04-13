@@ -1,0 +1,307 @@
+close all;
+% %CIFAR-10 Target task
+no_privacy = [97.68];
+maxent_arl_target = [97.7, 97.78, 97.74, 97.57, 97.54, ...% 0.1
+              97.62, 97.51, 97.41, 97.48, 97.47,...% 0.2
+              97.54, 97.59, 97.48, 97.44, 97.58, ....% 0.3
+              97.53, 97.33, 97.41, 97.25, 97.40, ....% 0.4
+              96.05, 95.01, 95.76, ...%0.44
+              96.06, 91.48, 92.66, ...%0.48
+              92.34, 94.34,...%0.52
+              60.5, 94.21,...%0.56
+              97.14, 97.06, 96.79, 96.88, 97.06,... % 0.5; 
+              96.78, 61.1700, 96.61, 96.38, 96.35; % 0.6
+              ];
+     
+ml_arl_target = [97.52, 97.30, 97.50, 97.51, 97.48, ....% 0.1
+    97.44, 97.40, 97.25, 97.22, 97.35,....% 0.2
+    97.37, 97.43, 97.41, 97.35, 97.38,....% 0.3
+    97.37, 97.48, 97.32, 97.43, 96.96,....%0.4
+    95.16, 96.58, 91.52,....%0.44
+    95.97, 94.11, 60.00,....          %0.48
+    94.00, 96.43,....         %0.52
+    91.15, 82.90,....         %0.56
+    91.53, 88.51, 60.00, 60.00, 60.00,....%0.5
+    60.00, 60.00, 60.00, 60.00, 60.00;%0.6
+    ];
+
+%CIFAR-10 Adversary task Maxent
+maxent_arl_adv_likelihood = [23.39, 23.44, 22.91, 23.11, 23.09,....% 0.1
+    23.13, 22.57, 22.41, 21.70, 24.44,....% 0.2
+    26.30, 22.92, 24.26, 23.77, 23.23,....% 0.3
+    21.17, 24.67, 22.96, 24.51, 22.75,....% 0.4
+    24.07, 19.05, 21.29,....         %0.44
+    25.74, 22.85, 21.8,....          %0.48
+    12.00, 21.79,...   %0.52
+    17.88, 24.36,....          %0.56
+    21.89, 23.27, 21.14, 21.40, 24.28,....% 0.5
+    21.59, 10.54, 22.77, 21.47, 22.16;% 0.6
+    ];
+maxent_arl_adv_entorpy = [1.6504, 1.6495, 1.6552, 1.6501, 1.6504,....% 0.1
+    1.6546, 1.6541, 1.6531, 1.6476, 1.6416,....% 0.2
+    1.6525, 1.6522, 1.6607, 1.6812, 1.7817,....% 0.3
+    2.1096, 1.7077, 1.7970, 1.7319, 1.8926,....% 0.4
+    1.7075, 1.9444, 2.2677,.... %0.44
+    1.7149, 1.8496, 1.8807 ,....        %0.48
+    2.2717, 1.9048,....        %0.52
+    2.2888, 1.7895,....          %0.56
+    2.2608, 1.8218, 2.2640, 1.8937, 1.6841,....% 0.5
+    2.2444, 2.2930, 1.7937, 2.1812, 1.9490;% 0.6
+    ];
+
+%CIFAR-10 Adversary task ML
+ml_arl_adv_likelihood = [20.83, 21.46, 20.94, 21.43, 21.70,....% 0.1
+    20.77, 21.26, 23.22, 21.66, 22.37,....% 0.2
+    20.88, 20.80, 21.35, 20.64, 21.02,....% 0.3
+    21.16, 21.59, 21.16, 21.34, 21.97,....% 0.4
+    20.89, 22.28, 19.68,....%0.44
+    20.65, 21.93, 14.55,....          %0.48
+    31.66, 24.64,....          %0.52
+    14.27, 23.19,....         %0.56
+    26.67, 25.09, 10.00, 10.00, 10.00,....% 0.5
+    10.00, 10.00, 10.00, 10.00, 10.00;% 0.6
+    ];
+ml_arl_adv_entorpy = [1.6471, 1.6452, 1.6564, 1.6471, 1.6529,....% 0.1
+    1.655, 1.6459, 1.6556, 1.6548, 1.6498,....% 0.2
+    1.6481, 1.6476, 1.6511, 1.6478, 1.6524,....% 0.3
+    1.6481, 1.6501, 1.6520, 1.6509, 1.6559,....% 0.4
+    1.7442, 1.8012, 2.0778,....%0.44
+    2.1636, 1.7271, 2.3008,....          %0.48
+    1.6630, 1.7207, ....          %0.52
+    1.8847, 1.7618,....          %0.56
+    1.7892, 1.8854, 2.3021, 2.2997, 2.3011,....% 0.5
+    2.2991, 2.3020, 2.3014, 2.3016, 2.2989;% 0.6
+    ];
+
+
+no_privacy_target = [97.67, 97.71, 97.75, 97.73,97.68];
+no_privacy_adv = [30.61, 24.18, 23.44, 23.09, 22.68];
+no_privacy_entropy = [1.5914, 1.6656, 1.6472, 1.6537, 1.6515];
+
+
+% figure;
+% hold all;
+% box on;
+% grid on;
+
+% c = vertcat(-no_privacy_target, no_privacy_adv, -no_privacy_entropy)';
+% [R3, ~] = bos(c);
+% index3 = R3==1;
+% h = scatter3(no_privacy_target(index3==1), no_privacy_adv(index3==1), no_privacy_entropy(index3==1), 100, 's' , 'MarkerFaceColor', 'g', 'MarkerEdgeColor', 'g', 'LineWidth', 1);
+% h.MarkerFaceAlpha = .5;
+% 
+% a = vertcat(-maxent_arl_target, maxent_arl_adv_likelihood, -maxent_arl_adv_entorpy)';
+% [R1, ~] = bos(a);
+% index1 = R1==1;
+% h = scatter3(maxent_arl_target(index1==1), maxent_arl_adv_likelihood(index1==1), maxent_arl_adv_entorpy(index1==1), 100, 'd' , 'MarkerFaceColor', 'r', 'MarkerEdgeColor', 'r', 'LineWidth', 1);
+% h.MarkerFaceAlpha = .5;
+% 
+% b = vertcat(-ml_arl_target, ml_arl_adv_likelihood, -ml_arl_adv_entorpy)';
+% [R2, ~] = bos(b);
+% index2 = R2==1;
+% h = scatter3(ml_arl_target(index2==1), ml_arl_adv_likelihood(index2==1), ml_arl_adv_entorpy(index2==1), 100, 'o' , 'MarkerFaceColor', 'b', 'MarkerEdgeColor', 'b', 'LineWidth', 1);
+% h.MarkerFaceAlpha = .5;
+
+
+figure;
+hold all;
+box on;
+grid on;
+
+c = vertcat(-no_privacy_target, no_privacy_adv)';
+[R3, ~] = bos(c);
+index3 = R3==1;
+h = scatter(no_privacy_target(index3==1), no_privacy_adv(index3==1), 100, 's' , 'MarkerFaceColor', 'g', 'MarkerEdgeColor', 'g', 'LineWidth', 1);
+h.MarkerFaceAlpha = .5;
+a = vertcat(-maxent_arl_target, maxent_arl_adv_likelihood)';
+[R1, ~] = bos(a);
+index1 = R1==1;
+h = scatter(maxent_arl_target(index1==1), maxent_arl_adv_likelihood(index1==1), 100, 'd' , 'MarkerFaceColor', 'r', 'MarkerEdgeColor', 'r', 'LineWidth', 1);
+h.MarkerFaceAlpha = .5;
+
+b = vertcat(-ml_arl_target, ml_arl_adv_likelihood)';
+[R2, ~] = bos(b);
+index2 = R2==1;
+h = scatter(ml_arl_target(index2==1), ml_arl_adv_likelihood(index2==1),  100, 'o' , 'MarkerFaceColor', 'b', 'MarkerEdgeColor', 'b', 'LineWidth', 1);
+h.MarkerFaceAlpha = .5;
+
+legend('No Privacy (HV: 42)','MaxEnt-ARL (HV: 89)', 'ML-ARL (HV: 71)')
+xlabel('Target Accuracy (%)')
+ylabel('Sensitive Accuracy (%)')
+set(gca,'FontSize',18)
+%[0.03056, 0.3240, 0.4152]
+
+figure;
+hold all;
+box on;
+grid on;
+
+c = vertcat(-no_privacy_target, -no_privacy_entropy)';
+[R3, ~] = bos(c);
+index3 = R3==1;
+h = scatter(no_privacy_target(index3==1), no_privacy_entropy(index3==1), 100, 's' , 'MarkerFaceColor', 'g', 'MarkerEdgeColor', 'g', 'LineWidth', 1);
+h.MarkerFaceAlpha = .5;
+a = vertcat(-maxent_arl_target, -maxent_arl_adv_entorpy)';
+[R1, ~] = bos(a);
+index1 = R1==1;
+h = scatter(maxent_arl_target(index1==1), maxent_arl_adv_entorpy(index1==1), 100, 'd' , 'MarkerFaceColor', 'r', 'MarkerEdgeColor', 'r', 'LineWidth', 1);
+h.MarkerFaceAlpha = .5;
+
+b = vertcat(-ml_arl_target,-ml_arl_adv_entorpy)';
+[R2, ~] = bos(b);
+index2 = R2==1;
+h = scatter(ml_arl_target(index2==1),  ml_arl_adv_entorpy(index2==1), 100, 'o' , 'MarkerFaceColor', 'b', 'MarkerEdgeColor', 'b', 'LineWidth', 1);
+h.MarkerFaceAlpha = .5;
+
+
+
+legend('No Privacy (HV: 42)','MaxEnt-ARL (HV: 89)', 'ML-ARL (HV: 71)')
+xlabel('Target Accuracy')
+ylabel('Adversary Entropy (nats)')
+set(gca,'FontSize',18)
+
+
+
+
+
+%CIFAR-100 Target task
+no_privacy_target = [71.82, 71.8, 71.56, 71.99, 71.57];
+no_privacy_adv = [35.04, 31.04, 30.59, 30.69, 31.00];
+no_privacy_entropy = [1.8387, 1.8897, 1.8581, 2.0876, 1.8876];
+
+
+
+maxent_arl_target = [71.17, 71.05, 70.80, 70.74, 70.50,...%0.1
+    67.47, 67.66, 68.69, 66.70, 68.97,....% 0.2
+    67.44, 66.31, 67.08, 67.63, 65.71,....%0.3
+    62.91, 34.58, 10.78,....%0.32
+    67.38, 47.49,.... %0.34
+    64.00, 63.29,....  %0.36
+    55.89, 61.33,....
+    63.81, 61.98, 60.03, 56.32, 59.11,....%0.4
+    49.65, 43.6, 34.42, 5.37, 25.87,....%0.5
+    5.00, 5.00, 5.00, 5.00, 5.00;%0.6
+    ];
+
+maxent_arl_adv_likelihood = [16.88,16.89, 16.60, 16.84, 16.43,....%0.1
+    20.53, 18.20, 17.50, 21.23, 19.51,.... %0.2
+    20.96, 16.80, 15.44, 13.23, 14.28,.... %0.3
+    25.04, 3.84, 17.76,....   %0.32
+    16.38, 9.11,.... %0.34
+    17.39, 14.41,....%0.36
+    16.19,15.35,....%0.38
+    8.38, 5.02, 3.8, 3.88, 2.81,....%0.4
+    3.83, 5.47, 4.59, 1.23, 4.8300,....%0.5
+    1.00, 1.00, 1.00, 1.00, 1.00,....%0.6
+];
+
+maxent_arl_adv_entorpy = [2.2681, 2.2771, 2.31,  2.2849, 2.2810,....%0.1
+    2.2870, 2.2830, 2.1921, 2.2356, 2.1539,.... %0.2
+    2.5439, 2.2508, 2.4143, 2.9087, 3.2359,....%0.3
+    2.1445, 4.406, 3.2274,.... %0.32
+    3.0078, 2.7313,....%0.34
+    3.0591, 3.1522,....%0.36
+    2.6311, 3.2522,....%0.38
+    4.1443, 4.5564, 4.5141, 4.5666, 4.5587,....%0.4
+    3.2461, 2.6434, 3.8993, 4.5881, 4.3870,....%0.5
+    4.5896, 4.6003, 4.5978, 4.6039, 4.6005,....%0.6
+    
+];
+
+%ml_arl_cifar100 = [71.32, % 0.1];
+%ml_arl_cifar100 = [70.52, % 0.2];
+ml_arl_target = [
+    71.32, 71.14, 71.16, 70.81, 70.64,....% 0.1
+    70.52, 70.60, 70.45, 70.33, 70.43,.... % 0.2
+    69.48, 69.78, 69.42, 69.41, 69.24,.... %0.3
+    69.98, 69.81, 69.66, 69.46, 69.36,....%0.4
+    54.46, 67.77,.... %0.42
+    56.99, 66.81,....%0.44
+    56.79, 64.90,.... %0.46%0.48
+    24.66, 22.22, 24.60, 23.95, 23.13,....%0.5
+    5.00, 5.00, 5.00, 5.00, 5.00;%0.6
+    ];
+
+ml_arl_adv_likelihood = [15.43, 17.17, 17.54, 17.62, 17.43,....%0.1
+15.09, 15.86, 15.76,15.17,14.84,....%0.2    
+14.68, 14.94, 14.41, 14.80, 14.92,....%0.3
+14.60, 14.65, 14.65, 16.15, 15.21,....%0.4
+16.59, 23.81,....%0.42
+22.92, 24.27,....%0.44%0.46
+24.02,16.97,....%0.48
+6.8100,6.72, 7.18, 6.93, 7.18,....%0.5
+1.00, 1.00, 1.00, 1.00, 1.00;%0.6
+];
+ml_arl_adv_entorpy = [2.4978, 2.2916, 2.3270, 2.3409, 2.3606,....%0.1
+ 2.2985, 2.3693, 2.3850, 2.3512, 2.3017,....%0.2
+ 2.2944, 2.2866, 2.3615, 2.3336, 2.2726,....%0.3
+ 2.3022, 2.2705,  2.2705, 2.1813, 2.3421,....%0.4
+ 2.8778, 2.4141,....%0.42
+ 2.6807, 2.2546,....%0.44%0.46
+ 2.6781, 2.5097,....%0.48
+ 3.7707,3.8829, 3.7310, 3.7674, 3.7696,....%0.5
+ 4.6040, 4.6039, 4.6040, 4.6040, 4.6042;
+    ];
+
+
+
+figure;
+hold all;
+box on;
+grid on;
+
+c = vertcat(-no_privacy_target, no_privacy_adv)';
+[R3, ~] = bos(c);
+index3 = R3==1;
+h = scatter(no_privacy_target(index3==1), no_privacy_adv(index3==1), 100, 's' , 'MarkerFaceColor', 'g', 'MarkerEdgeColor', 'g', 'LineWidth', 1);
+h.MarkerFaceAlpha = .5;
+a = vertcat(-maxent_arl_target, maxent_arl_adv_likelihood)';
+[R1, ~] = bos(a);
+index1 = R1==1;
+h = scatter(maxent_arl_target(index1==1), maxent_arl_adv_likelihood(index1==1), 100, 'd' , 'MarkerFaceColor', 'r', 'MarkerEdgeColor', 'r', 'LineWidth', 1);
+h.MarkerFaceAlpha = .5;
+
+b = vertcat(-ml_arl_target, ml_arl_adv_likelihood)';
+[R2, ~] = bos(b);
+index2 = R2==1;
+h = scatter(ml_arl_target(index2==1), ml_arl_adv_likelihood(index2==1),  100, 'o' , 'MarkerFaceColor', 'b', 'MarkerEdgeColor', 'b', 'LineWidth', 1);
+h.MarkerFaceAlpha = .5;
+
+legend('No Privacy','MaxEnt-ARL', 'ML-ARL')
+xlabel('Target Accuracy (%)')
+ylabel('Sensitive Accuracy (%)')
+zlabel('Entropy of Adversary')
+set(gca,'FontSize',18)
+%0.0022829311793658644, 0.42169686680043217, 0.5974015537377166
+
+
+
+figure;
+hold all;
+box on;
+grid on;
+
+c = vertcat(-no_privacy_target, -no_privacy_entropy)';
+[R3, ~] = bos(c);
+index3 = R3==1;
+h = scatter(no_privacy_target(index3==1), no_privacy_entropy(index3==1), 100, 's' , 'MarkerFaceColor', 'g', 'MarkerEdgeColor', 'g', 'LineWidth', 1);
+h.MarkerFaceAlpha = .5;
+a = vertcat(-maxent_arl_target, -maxent_arl_adv_entorpy)';
+[R1, ~] = bos(a);
+index1 = R1==1;
+h = scatter(maxent_arl_target(index1==1), maxent_arl_adv_entorpy(index1==1), 100, 'd' , 'MarkerFaceColor', 'r', 'MarkerEdgeColor', 'r', 'LineWidth', 1);
+h.MarkerFaceAlpha = .5;
+
+b = vertcat(-ml_arl_target,-ml_arl_adv_entorpy)';
+[R2, ~] = bos(b);
+index2 = R2==1;
+h = scatter(ml_arl_target(index2==1),  ml_arl_adv_entorpy(index2==1), 100, 'o' , 'MarkerFaceColor', 'b', 'MarkerEdgeColor', 'b', 'LineWidth', 1);
+h.MarkerFaceAlpha = .5;
+
+
+
+legend('No Privacy','MaxEnt-ARL', 'ML-ARL')
+xlabel('Target Accuracy')
+ylabel('Entropy of Adversary')
+set(gca,'FontSize',18)
+
