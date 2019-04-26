@@ -53,11 +53,11 @@ class MaxentNet:
 
         # filename
         self.log_file_name = ckpt_filename+"_log.txt"
-        self.adv_log_file_name = ckpt_filename+"_adv_"+"_log.txt"
-        self.target_log_file_name = ckpt_filename + "_target_" + "_log.txt"
+        self.adv_log_file_name = ckpt_filename+"_adv_log.txt"
+        self.target_log_file_name = ckpt_filename + "_target_log.txt"
         self.checkpoint_filename = ckpt_filename
-        self.adv_checkpoint_filename = ckpt_filename+"_adv_"+".ckpt"
-        self.target_checkpoint_filename = ckpt_filename + "_target_" + ".ckpt"
+        self.adv_checkpoint_filename = ckpt_filename+"_adv.ckpt"
+        self.target_checkpoint_filename = ckpt_filename + "_target.ckpt"
 
         # algorithm and visualization parameters
         self.alpha = torch.tensor([alpha*1.0], requires_grad=True)
@@ -148,9 +148,6 @@ class MaxentNet:
             data_size = len(self.train_loader)
 
         iteration = 0
-        feature_loader = []
-        target_label_loader = []
-        sensitive_label_loader = []
 
         self.t_losses.reset()
         self.e_losses.reset()
@@ -161,9 +158,7 @@ class MaxentNet:
         self.t_top5.reset()
         self.d_top5.reset()
         self.entropy_losses.reset()
-        # for batch_idx, (inputs, target_label, sensitive_label) in tqdm.tqdm(
-        #         enumerate(loader), total=len(loader),
-        #         desc=str+' epoch=%d' % self.epoch, ncols=80, leave=False):
+
         for batch_idx, (inputs, target_label, sensitive_label) in enumerate(loader):
 
             batch_size = inputs.size(0)
@@ -191,11 +186,9 @@ class MaxentNet:
 
             if self.privacy_flag:
                 d_outputs, _, d_prob = self.discriminator_net(z)
-                # with torch.no_grad():
                 entropy_loss = -self.entropy_loss(d_prob)
 
                 if self.privacy_option == 1:
-                    # s_loss = self.n_sensitive_class*self.kl_loss(torch.log(self.uniform.repeat(batch_size, 1)), d_prob)
                     s_loss = -entropy_loss  # self.kl_loss(torch.log(self.uniform.repeat(batch_size, 1)), d_prob)
                 else:
                     s_loss = -self.nll_loss(torch.log(d_prob+1e-16), self.sensitive_label)
@@ -268,19 +261,6 @@ class MaxentNet:
                         float(self.t_losses.avg), float(self.t_top1.avg.item()),
                         float(self.t_top5.avg.item())))
 
-            if self.data.embed_length == 2:
-                feature_loader.append(z)
-                target_label_loader.append((target_label))
-                sensitive_label_loader.append((sensitive_label))
-
-        # if self.data.embed_length == 2:
-        #     if epoch % self.plot_interval == 0:
-        #         feat = torch.cat(feature_loader, 0)
-        #         target_labels = torch.cat(target_label_loader, 0)
-        #         sensitive_labels = torch.cat(sensitive_label_loader, 0)
-        #         visualize(feat.data.cpu().numpy(), target_labels.data.cpu().numpy(),
-        #                   sensitive_labels.data.cpu().numpy(), self.epoch)
-
         return self.losses.avg, self.t_top1.avg, self.t_top5.avg, self.d_losses.avg, self.d_top1.avg, self.d_top5.avg, self.entropy_losses.avg
 
     def train(self):
@@ -305,11 +285,11 @@ class MaxentNet:
             self.logger.append([self.optimizer.param_groups[0]['lr'], float(train_loss), float(test_loss), float(train_acc), float(train_acc5),
                            float(test_acc), float(test_acc5), float(d_train_loss), float(d_test_loss), float(d_train_acc), float(d_train_acc5),
                            float(d_test_acc), float(d_test_acc5), float(d_train_entropy), float(d_test_entropy)])
-            # Save checkpoint.
-            # if test_loss < self.best_loss:
-            # if test_acc > self.best_acc:
-            if (epoch+1) % 10:  # if save_flag:
-                print('Saving..')
+
+            # it is optimum only when we reach the end of the game by optimization,
+            # any other value e.g. current discriminator feedback is non-optimal
+            if (epoch+1) % 10:
+                print('Saving..')  # Save checkpoint.
                 state = {
                     'net': self.net.module if self.use_cuda else self.net,
                     'state_dict': self.net.state_dict(),
@@ -345,9 +325,6 @@ class MaxentNet:
         self.adv_top5.reset()
         self.entropy_losses.reset()
 
-        # for batch_idx, (inputs, target_label, sensitive_label) in tqdm.tqdm(
-        #         enumerate(loader), total=len(loader),
-        #         desc=str+' epoch=%d' % self.epoch, ncols=80, leave=False):
         for batch_idx, (inputs, target_label, sensitive_label) in enumerate(loader):
             batch_size = inputs.size(0)
             iteration += 1
@@ -372,8 +349,8 @@ class MaxentNet:
                 d_loss.backward()
                 self.adv_optimizer.step()
 
-            d_prec1 = accuracy(d_outputs.data, self.sensitive_label.data)
-            d_prec5 = accuracy(d_outputs.data, self.sensitive_label.data, topk=(int(np.min([5, self.n_sensitive_class])),))
+            d_prec1 = accuracy(prob.data, self.sensitive_label.data)
+            d_prec5 = accuracy(prob.data, self.sensitive_label.data, topk=(int(np.min([5, self.n_sensitive_class])),))
             self.adv_losses.update(d_loss.data.item(), batch_size)
             self.adv_top1.update(d_prec1[0], batch_size)
             self.adv_top5.update(d_prec5[0], batch_size)
@@ -451,9 +428,6 @@ class MaxentNet:
         self.target_top5.reset()
         self.target_entropy_losses.reset()
 
-        # for batch_idx, (inputs, target_label, sensitive_label) in tqdm.tqdm(
-        #         enumerate(loader), total=len(loader),
-        #         desc=str+' epoch=%d' % self.epoch, ncols=80, leave=False):
         for batch_idx, (inputs, target_label, sensitive_label) in enumerate(loader):
             batch_size = inputs.size(0)
             iteration += 1
@@ -478,8 +452,8 @@ class MaxentNet:
                 d_loss.backward()
                 self.target_optimizer.step()
 
-            d_prec1 = accuracy(d_outputs.data, self.target_label.data)
-            d_prec5 = accuracy(d_outputs.data, self.target_label.data, topk=(int(np.min([5, self.n_target_class])),))
+            d_prec1 = accuracy(prob.data, self.target_label.data)
+            d_prec5 = accuracy(prob.data, self.target_label.data, topk=(int(np.min([5, self.n_target_class])),))
             self.target_losses.update(d_loss.data.item(), batch_size)
             self.target_top1.update(d_prec1[0], batch_size)
             self.target_top5.update(d_prec5[0], batch_size)
@@ -520,9 +494,9 @@ class MaxentNet:
 
             self.target_logger.append([self.target_optimizer.param_groups[0]['lr'], float(train_loss), float(test_loss), float(train_acc),
                            float(train_acc5), float(test_acc), float(test_acc5), float(train_entropy), float(test_entropy)])
-            # Save checkpoint.
+
             if test_acc > self.target_best_acc:
-                print('Saving..')
+                print('Saving..')  # Save checkpoint.
                 state = {
                     'net': self.target_net.module if self.use_cuda else self.target_net,
                     'state_dict': self.target_net.state_dict(),
