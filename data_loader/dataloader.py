@@ -1,5 +1,5 @@
 from torch.utils.data import Dataset
-# import pandas as pd
+import pandas as pd
 import sklearn.preprocessing as preprocessing
 import pickle
 import torchvision
@@ -127,7 +127,7 @@ class AdultDataLoader(PrivacyDataLoader):
                                                   lr=0.001, weight_decay=1e-3, betas=(0.9, 0.999))
         self.discriminator_optimizer = optim.Adam(self.discriminator_net.parameters(),
                                                   lr=0.001, weight_decay=1e-3, betas=(0.9, 0.999))
-        self.adv_optimizer = optim.Adam(self.discriminator_net.parameters(),
+        self.adv_optimizer = optim.Adam(self.adversary_net.parameters(),
                                                   lr=0.001, weight_decay=1e-3, betas=(0.9, 0.999))
 
 
@@ -188,7 +188,7 @@ class ExtendedYaleBDataLoader(PrivacyDataLoader):
         self.target_optimizer = optim.Adam(self.target_net.parameters(), lr=0.0001, weight_decay=5e-4, betas=(0.9, 0.999))
         self.discriminator_optimizer = optim.Adam(self.discriminator_net.parameters(),
                                                   lr=0.0001, weight_decay=5e-4, betas=(0.9, 0.999))
-        self.adv_optimizer = optim.Adam(self.discriminator_net.parameters(),
+        self.adv_optimizer = optim.Adam(self.adversary_net.parameters(),
                                                   lr=0.0001, weight_decay=5e-4, betas=(0.9, 0.999))
 
 
@@ -245,7 +245,7 @@ class GermanDataLoader(PrivacyDataLoader):
                                                   lr=0.001, weight_decay=1e-3, betas=(0.9, 0.999))
         self.discriminator_optimizer = optim.Adam(self.discriminator_net.parameters(),
                                                   lr=0.001, weight_decay=1e-3, betas=(0.9, 0.999))
-        self.adv_optimizer = optim.Adam(self.discriminator_net.parameters(),
+        self.adv_optimizer = optim.Adam(self.adversary_net.parameters(),
                                                   lr=0.001, weight_decay=1e-3, betas=(0.9, 0.999))
 
 
@@ -946,5 +946,5 @@ class ImageNetDataLoader(PrivacyDataLoader):
                                                       lr=0.0001, weight_decay=1e-3, betas=(0.9, 0.999))
             self.discriminator_optimizer = optim.Adam(self.discriminator_net.parameters(),
                                                       lr=0.0001, weight_decay=1e-3, betas=(0.9, 0.999))
-            self.adv_optimizer = optim.Adam(self.discriminator_net.parameters(),
+            self.adv_optimizer = optim.Adam(self.adversary_net.parameters(),
                                             lr=0.0001, weight_decay=1e-3, betas=(0.9, 0.999))
